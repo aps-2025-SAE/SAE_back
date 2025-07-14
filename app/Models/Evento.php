@@ -10,7 +10,8 @@ class Evento extends Model
         'tipo',
         'valor',
         'descricao',
-        'datas',
+        'data_inicio',
+        'data_fim',
         'numOfertasDiarias',
     ];
 }
