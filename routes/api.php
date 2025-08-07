@@ -32,3 +32,4 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/cliente/agendamentos', [PedidoController::class, 'index']);
 });
 
+Route::post('/cliente/cadastro-rapido', [ClienteAuthController::class, 'cadastroRapido']);
