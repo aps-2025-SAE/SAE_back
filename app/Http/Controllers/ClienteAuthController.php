@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cliente;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ClienteAuthController extends Controller
 {
@@ -56,5 +57,30 @@ class ClienteAuthController extends Controller
         $request->user()->tokens()->delete();
 
         return response()->json(['message' => 'Logout realizado com sucesso.']);
+    }
+
+    public function cadastroRapido(Request $request)
+    {
+        $request->validate([
+            'nome_completo' => 'required|string|max:255',
+            'telefone' => 'required|string|max:20',
+        ]);
+
+        $cliente = Cliente::where('telefone', $request->telefone)->first();
+
+        if (!$cliente) {
+            $cliente = Cliente::create([
+                'nome_completo' => $request->nome_completo,
+                'telefone' => $request->telefone,
+                'password' => bcrypt(Str::random(8)), // senha aleatória
+            ]);
+        }
+
+        $token = $cliente->createToken('cliente_token')->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'cliente' => $cliente
+        ]);
     }
 }
