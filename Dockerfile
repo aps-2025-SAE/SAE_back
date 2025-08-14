@@ -8,7 +8,6 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-
 # 2) Stage Composer: instala vendor/
 FROM composer:2 AS composer_builder
 WORKDIR /app
@@ -16,7 +15,6 @@ COPY composer.json composer.lock ./
 RUN composer install --no-dev --prefer-dist --no-interaction --no-scripts
 COPY . .
 RUN composer install --no-dev --prefer-dist --no-interaction --optimize-autoloader --no-scripts
-
 
 # 3) Stage final PHP-FPM (ajuste extensões se precisar)
 FROM php:8.2-fpm-alpine
