@@ -19,29 +19,20 @@ class EventoController extends Controller
             'tipo' => 'required|string',
             'valor' => 'required|numeric',
             'descricao' => 'required|string',
-            'data_inicio' => 'required|date|after_or_equal:today',
-            'data_fim' => 'required|date|after_or_equal:data_inicio',
+            'datas' => 'required|date|after_or_equal:today',
             'numOfertasDiarias' => 'required|integer',
         ], [
-            'data_inicio.after_or_equal' => 'A data de início precisa ser hoje ou futura!',
-            'data_fim.after_or_equal' => 'A data final precisa ser igual ou maior que a data de início!',
+            'datas.after_or_equal' => 'A data precisa ser hoje ou futura!',
         ]);
 
-        // Verifica se já existe evento com o mesmo tipo e intervalo que conflita
+        //Verifica se já existe um evento com o mesmo tipo e data
         $existeEvento = Evento::where('tipo', $request->tipo)
-            ->where(function($query) use ($request) {
-                $query->whereBetween('data_inicio', [$request->data_inicio, $request->data_fim])
-                      ->orWhereBetween('data_fim', [$request->data_inicio, $request->data_fim])
-                      ->orWhere(function($q) use ($request) {
-                          $q->where('data_inicio', '<=', $request->data_inicio)
-                            ->where('data_fim', '>=', $request->data_fim);
-                      });
-            })
+            ->where('datas', $request->datas)
             ->exists();
 
         if ($existeEvento) {
             return response()->json([
-                'message' => 'Já existe um evento cadastrado com o mesmo tipo e intervalo de datas que conflita.'
+                'message' => 'Já existe um evento cadastrado com o mesmo tipo e data.'
             ], 422);
         }
 
@@ -52,6 +43,7 @@ class EventoController extends Controller
             'data' => $evento
         ], 201);
     }
+
 
     public function show($id)
     {
@@ -65,32 +57,22 @@ class EventoController extends Controller
             'tipo' => 'required|string',
             'valor' => 'required|numeric',
             'descricao' => 'required|string',
-            'data_inicio' => 'required|date|after_or_equal:today',
-            'data_fim' => 'required|date|after_or_equal:data_inicio',
+            'datas' => 'required|date|after_or_equal:today',
             'numOfertasDiarias' => 'required|integer',
         ], [
-            'data_inicio.after_or_equal' => 'A data de início precisa ser hoje ou futura!',
-            'data_fim.after_or_equal' => 'A data final precisa ser igual ou maior que a data de início!',
+            'datas.after_or_equal' => 'A data precisa ser hoje ou futura!',
         ]);
 
         $evento = Evento::findOrFail($id);
 
-        // Impede conflito de datas com outros eventos do mesmo tipo
-        $existeEvento = Evento::where('tipo', $request->tipo)
+        // Impede atualizar para uma data já existente em outro evento
+        $existeEvento = Evento::where('datas', $request->datas)
             ->where('id', '!=', $id)
-            ->where(function($query) use ($request) {
-                $query->whereBetween('data_inicio', [$request->data_inicio, $request->data_fim])
-                      ->orWhereBetween('data_fim', [$request->data_inicio, $request->data_fim])
-                      ->orWhere(function($q) use ($request) {
-                          $q->where('data_inicio', '<=', $request->data_inicio)
-                            ->where('data_fim', '>=', $request->data_fim);
-                      });
-            })
             ->exists();
 
         if ($existeEvento) {
             return response()->json([
-                'message' => 'Já existe outro evento cadastrado no intervalo de datas informado.'
+                'message' => 'Já existe outro evento cadastrado nesta data.'
             ], 422);
         }
 
@@ -101,6 +83,7 @@ class EventoController extends Controller
             'data' => $evento
         ]);
     }
+
 
     public function destroy($id)
     {

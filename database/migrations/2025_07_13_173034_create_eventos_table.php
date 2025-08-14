@@ -16,12 +16,11 @@ return new class extends Migration
             $table->string('tipo');
             $table->decimal('valor', 10, 2);
             $table->text('descricao');
-            $table->date('data_inicio');
-            $table->date('data_fim');
+            $table->date('datas');
             $table->unsignedInteger('numOfertasDiarias');
             $table->timestamps();
 
-            $table->unique(['tipo', 'data_inicio', 'data_fim']);
+            $table->unique(['tipo', 'datas']);
         });
     }
 
