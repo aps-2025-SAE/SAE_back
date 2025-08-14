@@ -10,20 +10,20 @@ class Pedido extends Model
     use HasFactory;
 
     protected $fillable = [
-        'cliente_id',
-        'evento_id',
-        'data_solicitada',
-        'horario',
-        'endereco',
-        'quantidade_pessoas',
-        'status',
-        'motivo_recusa',
-        'secretario_id',
-        'avaliado_em',
+    'cliente_id',
+    'evento_id',
+    'data_solicitada',
+    'horario',
+    'endereco',
+    'quantidade_pessoas',
+    'status',
+    'motivo_recusa',
+    'secretario_id',
+    'avaliado_em',
     ];
 
     protected $casts = [
-        'data_solicitada' => 'date',
+        'data_solicitada' => 'date:Y-m-d',
         'avaliado_em' => 'datetime',
     ];
 

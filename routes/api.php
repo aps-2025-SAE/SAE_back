@@ -38,6 +38,8 @@ Route::prefix('secretario')->group(function () {
     Route::middleware(['auth:sanctum', SecretarioMiddleware::class])->group(function () {
         Route::get('/pedidos', [PedidoAprovacaoController::class, 'index']);
         Route::get('/pedidos/{pedido}', [PedidoAprovacaoController::class, 'show']);
+        Route::put('/pedidos/{pedido}', [PedidoAprovacaoController::class, 'update']);
+        Route::delete('/pedidos/{pedido}', [PedidoAprovacaoController::class, 'destroy']);
         Route::post('/pedidos/{pedido}/aprovar', [PedidoAprovacaoController::class, 'aprovar']);
         Route::post('/pedidos/{pedido}/recusar', [PedidoAprovacaoController::class, 'recusar']);
     });
