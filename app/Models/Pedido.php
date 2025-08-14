@@ -17,6 +17,14 @@ class Pedido extends Model
         'endereco',
         'quantidade_pessoas',
         'status',
+        'motivo_recusa',
+        'secretario_id',
+        'avaliado_em',
+    ];
+
+    protected $casts = [
+        'data_solicitada' => 'date',
+        'avaliado_em' => 'datetime',
     ];
 
     public function cliente()
@@ -29,4 +37,8 @@ class Pedido extends Model
         return $this->belongsTo(\App\Models\Evento::class);
     }
 
+    public function secretario()
+    {
+        return $this->belongsTo(Secretario::class);
+    }
 }

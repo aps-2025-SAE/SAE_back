@@ -6,9 +6,11 @@ use App\Http\Controllers\EventoController;
 use App\Http\Controllers\ClienteController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ClienteAuthController;
+use App\Http\Controllers\SecretarioAuthController;
+use App\Http\Controllers\PedidoAprovacaoController;
+use App\Http\Middleware\SecretarioMiddleware;
 
-Route::post('/administrador', [\App\Http\Controllers\AdministradorController::class, 'store']);
-
+Route::post('/administrador', [AdministradorController::class, 'store']);
 Route::post('/login', [AdministradorController::class, 'login']);
 
 Route::apiResource('eventos', EventoController::class);
@@ -17,19 +19,26 @@ Route::prefix('cliente')->group(function () {
     Route::get('/inicio', [ClienteController::class, 'inicio']);
     Route::get('/eventos', [ClienteController::class, 'todos']);
     Route::get('/eventos/disponiveis', [ClienteController::class, 'disponiveis']);
+
+    Route::post('/register', [ClienteAuthController::class, 'register']);
+    Route::post('/login', [ClienteAuthController::class, 'login']);
+    Route::post('/cadastro-rapido', [ClienteAuthController::class, 'cadastroRapido']);
 });
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/cliente/pedido', [PedidoController::class, 'store']);
+Route::middleware('auth:sanctum')->prefix('cliente')->group(function () {
+    Route::post('/logout', [ClienteAuthController::class, 'logout']);
+    Route::post('/pedido', [PedidoController::class, 'store']);
+    Route::get('/agendamentos', [PedidoController::class, 'index']);
 });
 
-Route::post('/cliente/register', [ClienteAuthController::class, 'register']);
-Route::post('/cliente/login', [ClienteAuthController::class, 'login']);
+Route::prefix('secretario')->group(function () {
+    Route::post('/register', [SecretarioAuthController::class, 'register']);
+    Route::post('/login', [SecretarioAuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/cliente/logout', [ClienteAuthController::class, 'logout']);
-    Route::post('/cliente/pedido', [PedidoController::class, 'store']);
-    Route::get('/cliente/agendamentos', [PedidoController::class, 'index']);
+    Route::middleware(['auth:sanctum', SecretarioMiddleware::class])->group(function () {
+        Route::get('/pedidos', [PedidoAprovacaoController::class, 'index']);
+        Route::get('/pedidos/{pedido}', [PedidoAprovacaoController::class, 'show']);
+        Route::post('/pedidos/{pedido}/aprovar', [PedidoAprovacaoController::class, 'aprovar']);
+        Route::post('/pedidos/{pedido}/recusar', [PedidoAprovacaoController::class, 'recusar']);
+    });
 });
-
-Route::post('/cliente/cadastro-rapido', [ClienteAuthController::class, 'cadastroRapido']);
