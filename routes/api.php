@@ -3,23 +3,33 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdministradorController;
 use App\Http\Controllers\EventoController;
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\PedidoController;
+use App\Http\Controllers\ClienteAuthController;
 
-// Rota para cadastro de administrador
-Route::post('/administrador', [AdministradorController::class, 'store']);
+Route::post('/administrador', [\App\Http\Controllers\AdministradorController::class, 'store']);
 
-// Rota de login
-Route::post('/login', [AdministradorController::class, 'login'])->name('login');
+Route::post('/login', [AdministradorController::class, 'login']);
 
-// Rotas de eventos
 Route::apiResource('eventos', EventoController::class);
 
-// Rota para cadastrar usuário comum
-Route::post('/usuarios', [AdministradorController::class, 'registrarUsuario']);
-
-
-// Rotas de gerenciamento de usuários - UC11
-Route::middleware('auth:sanctum')->prefix('usuarios')->group(function () {
-    Route::get('/', [AdministradorController::class, 'listarUsuarios']);
-    Route::put('/{id}', [AdministradorController::class, 'editarUsuario']);
-    Route::delete('/{id}', [AdministradorController::class, 'removerUsuario']);
+Route::prefix('cliente')->group(function () {
+    Route::get('/inicio', [ClienteController::class, 'inicio']);
+    Route::get('/eventos', [ClienteController::class, 'todos']);
+    Route::get('/eventos/disponiveis', [ClienteController::class, 'disponiveis']);
 });
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/cliente/pedido', [PedidoController::class, 'store']);
+});
+
+Route::post('/cliente/register', [ClienteAuthController::class, 'register']);
+Route::post('/cliente/login', [ClienteAuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/cliente/logout', [ClienteAuthController::class, 'logout']);
+    Route::post('/cliente/pedido', [PedidoController::class, 'store']);
+    Route::get('/cliente/agendamentos', [PedidoController::class, 'index']);
+});
+
+Route::post('/cliente/cadastro-rapido', [ClienteAuthController::class, 'cadastroRapido']);
